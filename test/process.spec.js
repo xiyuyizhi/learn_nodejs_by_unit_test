@@ -1,33 +1,32 @@
-const assert = require("assert");
-const path = require("path");
-const { spawn, exec } = require("child_process");
-const shellPath = path.resolve(__dirname, "../src", "process.js");
+const assert = require('assert');
+const path = require('path');
+const { spawn, exec } = require('child_process');
+const { execShell } = require('../util/util');
+const SHELL_NAME = 'process.js';
 
-function translateArrStrToArr(str) {
-    str = str.replace(/[\[\]\s']/g, "");
-    return str.split(",");
-}
-
-describe("#process", function() {
-    it("test process.argv`", done => {
-        exec(`node ${shellPath} test_argv`, (err, stdout, stderr) => {
-            let argv = translateArrStrToArr(stdout);
-            assert.equal(argv.length, 3);
-            done();
-        });
+describe('#process', function() {
+  it('test process.argv`', done => {
+    execShell(['process.js', 'test_argv'], argv => {
+      assert.equal(argv.length, 3);
+      done();
     });
-    it("test process.argv.length`", done => {
-        exec(`node ${shellPath} length arg2 arg3`, (err, stdout, stderr) => {
-            let argv = translateArrStrToArr(stdout);
-            assert.equal(argv[0], 5);
-            done();
-        });
+  });
+  it('test process.argv.length`', done => {
+    execShell(['process.js', 'length', 'arg2', 'arg3'], argv => {
+      assert.equal(argv[0], 5);
+      done();
     });
-    it("test process.argv0`", done => {
-        exec(`node ${shellPath} test_argv0`, (err, stdout, stderr) => {
-            let argv = translateArrStrToArr(stdout);
-            assert.equal(argv, "node");
-            done();
-        });
+  });
+  it('test process.argv0`', done => {
+    execShell(['process.js', 'test_argv0'], argv => {
+      assert.equal(argv, 'node');
+      done();
     });
+  });
+  it('test set node_env by node command and get by process.env.NODE_ENV`', done => {
+    execShell(['process.js', 'env'], ['NODE_ENV=development'], argv => {
+      assert.equal(argv[0], 'development');
+      done();
+    });
+  });
 });
