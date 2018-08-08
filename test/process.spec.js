@@ -29,4 +29,37 @@ describe('#process', function() {
       done();
     });
   });
+
+  it('test beforeExit event', done => {
+    execShell(['process.js', 'beforeExit'], argv => {
+      assert.equal(argv[0], 'exitCode:0');
+      done();
+    });
+  });
+  it('test beforeExit event not emit when explicitly call process.exit()', done => {
+    execShell(['process.js', 'processExplicitlyExit'], (argv, stderr, err) => {
+      assert.equal(argv[0], undefined);
+      assert.equal(err, null);
+      done();
+    });
+  });
+  it('test beforeExit event not emit when explicitly call process.exit(1)', done => {
+    execShell(['process.js', 'processExplicitlyExit1'], (argv, stderr, err) => {
+      assert.equal(argv[0], undefined);
+      assert.ok(err);
+      done();
+    });
+  });
+  it('test beforeExit event emit when explicitly set process.exitCode', done => {
+    execShell(
+      ['process.js', 'processExplicitlyExitCode'],
+      (argv, stderr, err) => {
+        assert.equal(argv.length, 2);
+        assert.equal(argv[0], 'exitCode:1');
+        assert.equal(argv[1], 'ExitEvnt|exitCode:1');
+        assert.ok(err);
+        done();
+      }
+    );
+  });
 });

@@ -18,6 +18,6 @@ exports.execShell = (argvs = [], preArgs, callback) => {
   const shellCommand = params.join(' ');
   exec(shellCommand, (err, stdout, stderr) => {
     let argv = translateArrStrToArr(stdout);
-    callback(argv);
+    callback(argv, stderr, err);
   });
 };
