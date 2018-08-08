@@ -1,6 +1,6 @@
 const assert = require('assert');
 const path = require('path');
-const { spawn, exec } = require('child_process');
+const { spawn, exec, fork } = require('child_process');
 const { execShell } = require('../util/util');
 const SHELL_NAME = 'process.js';
 
@@ -61,5 +61,36 @@ describe('#process', function() {
         done();
       }
     );
+  });
+  it('test process.send,subProcess.pid ', done => {
+    const subprocess = fork(path.join(__dirname, '../src/process.js'), [
+      'signal'
+    ]);
+    subprocess.on('message', pid => {
+      assert.equal(subprocess.pid, pid);
+      done();
+    });
+  });
+
+  it('test kill child process by parent process ', done => {
+    const subprocess = fork(path.join(__dirname, '../src/process.js'), [
+      'killChild'
+    ]);
+
+    assert.equal(subprocess.connected, true);
+
+    subprocess.on('message', data => {
+      assert.equal('exit', data + '1');
+    });
+
+    setTimeout(() => {
+      subprocess.kill();
+      // subprocess.send('exit');
+    }, 100);
+
+    setTimeout(() => {
+      assert.equal(subprocess.connected, false);
+      done();
+    }, 300);
   });
 });

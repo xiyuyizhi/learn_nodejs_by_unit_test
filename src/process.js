@@ -23,6 +23,12 @@ switch (process.argv[2]) {
   case 'processExplicitlyExitCode':
     processExplicitlyExitCode();
     break;
+  case 'signal':
+    signal();
+    break;
+  case 'killChild':
+    killChild();
+    break;
 }
 
 function beforeExit() {
@@ -58,4 +64,26 @@ function processExplicitlyExitCode() {
   });
 
   process.exitCode = 1;
+}
+
+function signal() {
+  process.send(process.pid);
+}
+
+function killChild() {
+  setInterval(() => {}, 3000);
+
+  process.on('SIGTERM', () => {
+    console.log('got SIGTERM signal');
+    process.exit();
+  });
+
+  process.on('message', msg => {
+    console.log('child get msg: ' + msg);
+    process.exit();
+  });
+
+  process.on('exit', () => {
+    console.log(`process ${process.pid} exit`);
+  });
 }
