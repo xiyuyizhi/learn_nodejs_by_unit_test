@@ -1,50 +1,51 @@
 const assert = require('assert');
-const path = require('path');
 const { spawn, exec, fork } = require('child_process');
 const { execShell } = require('../util/util');
 const SHELL_NAME = 'process.js';
 
 describe('#process', function() {
+  this.timeout(5000);
+
   it('test process.argv`', done => {
-    execShell(['process.js', 'test_argv'], argv => {
+    execShell([SHELL_NAME, 'test_argv'], argv => {
       assert.equal(argv.length, 3);
       done();
     });
   });
   it('test process.argv.length`', done => {
-    execShell(['process.js', 'length', 'arg2', 'arg3'], argv => {
+    execShell([SHELL_NAME, 'length', 'arg2', 'arg3'], argv => {
       assert.equal(argv[0], 5);
       done();
     });
   });
   it('test process.argv0`', done => {
-    execShell(['process.js', 'test_argv0'], argv => {
+    execShell([SHELL_NAME, 'test_argv0'], argv => {
       assert.equal(argv, 'node');
       done();
     });
   });
   it('test set node_env by node command and get by process.env.NODE_ENV`', done => {
-    execShell(['process.js', 'env'], ['NODE_ENV=development'], argv => {
+    execShell([SHELL_NAME, 'env'], ['NODE_ENV=development'], argv => {
       assert.equal(argv[0], 'development');
       done();
     });
   });
 
   it('test beforeExit event', done => {
-    execShell(['process.js', 'beforeExit'], argv => {
+    execShell([SHELL_NAME, 'beforeExit'], argv => {
       assert.equal(argv[0], 'exitCode:0');
       done();
     });
   });
   it('test beforeExit event not emit when explicitly call process.exit()', done => {
-    execShell(['process.js', 'processExplicitlyExit'], (argv, stderr, err) => {
+    execShell([SHELL_NAME, 'processExplicitlyExit'], (argv, stderr, err) => {
       assert.equal(argv[0], undefined);
       assert.equal(err, null);
       done();
     });
   });
   it('test beforeExit event not emit when explicitly call process.exit(1)', done => {
-    execShell(['process.js', 'processExplicitlyExit1'], (argv, stderr, err) => {
+    execShell([SHELL_NAME, 'processExplicitlyExit1'], (argv, stderr, err) => {
       assert.equal(argv[0], undefined);
       assert.ok(err);
       done();
@@ -52,7 +53,7 @@ describe('#process', function() {
   });
   it('test beforeExit event emit when explicitly set process.exitCode', done => {
     execShell(
-      ['process.js', 'processExplicitlyExitCode'],
+      [SHELL_NAME, 'processExplicitlyExitCode'],
       (argv, stderr, err) => {
         assert.equal(argv.length, 2);
         assert.equal(argv[0], 'exitCode:1');
@@ -62,35 +63,50 @@ describe('#process', function() {
       }
     );
   });
-  it('test process.send,subProcess.pid ', done => {
-    const subprocess = fork(path.join(__dirname, '../src/process.js'), [
-      'signal'
-    ]);
-    subprocess.on('message', pid => {
-      assert.equal(subprocess.pid, pid);
+
+  it('test process.nextTick()', done => {
+    execShell([SHELL_NAME, 'nextTick'], argv => {
+      assert.deepEqual(argv, [
+        'before',
+        'after',
+        'in_Tick_callback',
+        'in_Immediate'
+      ]);
       done();
     });
   });
 
-  it('test kill child process by parent process ', done => {
-    const subprocess = fork(path.join(__dirname, '../src/process.js'), [
-      'killChild'
-    ]);
-
-    assert.equal(subprocess.connected, true);
-
-    subprocess.on('message', data => {
-      assert.equal('exit', data + '1');
+  describe('## Error Catch And Promise', () => {
+    it('test unhandledRejection Event emit when no catch(),no error handler in then()', done => {
+      execShell([SHELL_NAME, 'unhandledRejectionEmit'], (argv, stderr, err) => {
+        assert.equal(argv[0], 'in_unhandledRejection_event:reject_value');
+        done();
+      });
     });
-
-    setTimeout(() => {
-      subprocess.kill();
-      // subprocess.send('exit');
-    }, 100);
-
-    setTimeout(() => {
-      assert.equal(subprocess.connected, false);
-      done();
-    }, 300);
+    it('test unhandledRejection Event not emit', done => {
+      execShell(
+        [SHELL_NAME, 'unhandledRejectionNoEmit'],
+        (argv, stderr, err) => {
+          assert.equal(argv.length, 1);
+          assert.equal(argv[0], 'in_catch_:reject_value');
+          done();
+        }
+      );
+    });
+    it('test throw error in success handler of then() and catch error in catch()', done => {
+      execShell([SHELL_NAME, 'throwErrorInThen'], (argv, stderr, err) => {
+        assert.equal(argv.length, 2);
+        assert.equal(argv[0], 'get_result:resolve_value');
+        assert.equal(argv[1], 'in_catch_:error_in_success_handler');
+        done();
+      });
+    });
+    it('test uncaughtException Event not emit', done => {
+      execShell([SHELL_NAME, 'uncaughtExceptionNoEmit'], argv => {
+        assert.equal(argv.length, 1);
+        assert.equal(argv[0], 'In_Catch:error');
+        done();
+      });
+    });
   });
 });

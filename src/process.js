@@ -29,6 +29,21 @@ switch (process.argv[2]) {
   case 'killChild':
     killChild();
     break;
+  case 'nextTick':
+    nextTick();
+    break;
+  case 'unhandledRejectionEmit':
+    unhandledRejectionEmit();
+    break;
+  case 'unhandledRejectionNoEmit':
+    unhandledRejectionNoEmit();
+    break;
+  case 'throwErrorInThen':
+    throwErrorInThen();
+    break;
+  case 'uncaughtExceptionNoEmit':
+    uncaughtExceptionNoEmit();
+    break;
 }
 
 function beforeExit() {
@@ -67,6 +82,7 @@ function processExplicitlyExitCode() {
 }
 
 function signal() {
+  console.log('signal......');
   process.send(process.pid);
 }
 
@@ -86,4 +102,75 @@ function killChild() {
   process.on('exit', () => {
     console.log(`process ${process.pid} exit`);
   });
+}
+
+function nextTick() {
+  setImmediate(() => {
+    console.log('in_Immediate');
+  });
+  process.nextTick(() => {
+    console.log('in_Tick_callback');
+  });
+  console.log('before');
+  console.log('after');
+}
+
+function unhandledRejectionEmit() {
+  process.on('unhandledRejection', (reason, p) => {
+    console.log('in_unhandledRejection_event:' + reason);
+  });
+
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject('reject_value');
+    }, 200);
+  });
+}
+
+function unhandledRejectionNoEmit() {
+  process.on('unhandledRejection', (reason, p) => {
+    //will emit when not catch below
+    console.log('can not emit');
+  });
+
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject('reject_value');
+    }, 200);
+  }).catch(x => {
+    console.log('in_catch_:' + x);
+  });
+}
+
+function throwErrorInThen() {
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve('resolve_value');
+    }, 200);
+  })
+    .then(
+      res => {
+        console.log('get_result:' + res);
+        throw new Error('error_in_success_handler');
+      },
+      error => {
+        console.log('not emit');
+      }
+    )
+    .catch(x => {
+      console.log('in_catch_:' + x.message);
+    });
+}
+
+function uncaughtExceptionNoEmit() {
+  process.on('uncaughtException', err => {
+    //will emit when no catch below
+    console.log('uncaughtException:' + err.message);
+  });
+
+  try {
+    throw new Error('error');
+  } catch (x) {
+    console.log('In_Catch:' + x.message);
+  }
 }

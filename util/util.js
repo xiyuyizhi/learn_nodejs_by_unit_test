@@ -2,9 +2,13 @@ const path = require('path');
 const { spawn, exec } = require('child_process');
 const DIRNAME = path.resolve(__dirname, '../src');
 
-const translateArrStrToArr = str => {
+exports.translateArrStrToArr = str => {
   str = str.replace(/[\[\] ']/g, ''); // 替换 [ ] ' ' '
   return str.split(/[\n,]/).filter(x => !!x);
+};
+
+exports.resolvePath = shellName => {
+  return path.resolve(__dirname, '../src', shellName);
 };
 
 exports.execShell = (argvs = [], preArgs, callback) => {

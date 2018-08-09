@@ -1,26 +1,27 @@
 {
-    "name": "learn_nodejs_by_unit_test",
-    "version": "0.0.1",
-    "description": "learn nodejs by write unit test for api",
-    "main": "index.js",
-    "scripts": {
-        "test": "mocha --watch --recursive"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git@github.com/xiyuyizhi/learn_nodejs_by_unit_test.git"
-    },
-    "keywords": [
-        "nodejs",
-        "unit",
-        "test",
-        "mocha",
-        "chai"
-    ],
-    "author": "xiyuyizhi",
-    "license": "ISC",
-    "dependencies": {
-        "chai": "^4.1.2",
-        "mocha": "^5.2.0"
-    }
+  "name": "learn_nodejs_by_unit_test",
+  "version": "0.0.1",
+  "description": "learn nodejs by write unit test for api",
+  "main": "index.js",
+  "scripts": {
+    "test_all": "mocha --watch --recursive",
+    "test": "mocha --watch  test/child_process.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com/xiyuyizhi/learn_nodejs_by_unit_test.git"
+  },
+  "keywords": [
+    "nodejs",
+    "unit",
+    "test",
+    "mocha",
+    "chai"
+  ],
+  "author": "xiyuyizhi",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
+  }
 }
