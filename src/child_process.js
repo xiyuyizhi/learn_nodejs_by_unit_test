@@ -17,6 +17,9 @@ switch (process.argv[2]) {
   case 'closeChannel':
     closeChannel();
     break;
+  case 'stdinWritable':
+    stdinWritable();
+    break;
 }
 
 function signal() {
@@ -58,4 +61,10 @@ function closeChannel() {
   });
 
   process.on('message', () => {});
+}
+
+function stdinWritable() {
+  process.stdin.on('data', data => {
+    console.log(data.toString());
+  });
 }

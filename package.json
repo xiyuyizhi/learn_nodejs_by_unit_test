@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test_all": "mocha --watch --recursive",
-    "test": "mocha --watch  test/child_process.spec.js"
+    "test": "mocha --watch  test/stream.spec.js"
   },
   "repository": {
     "type": "git",
