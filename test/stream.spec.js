@@ -4,12 +4,16 @@ const { execSync } = require('child_process');
 const { PassThrough, Writable } = require('stream');
 const FILEPATH = 'test/write.txt';
 
+let pass;
+
 describe('#Stream', () => {
   beforeEach(() => {
     fs.openSync(FILEPATH, 'w+');
+    pass = new PassThrough();
   });
   afterEach(() => {
     fs.unlinkSync(FILEPATH);
+    pass = null;
   });
 
   it('test Writable stream reach highWaterMark', done => {
@@ -39,7 +43,6 @@ describe('#Stream', () => {
 
   it('test readable stream two Mode : flowing', done => {
     //自动读取数据,data时间
-    const pass = new PassThrough();
     pass.on('data', chunk => {
       assert.equal(chunk.toString(), 'flowing mode');
       done();
@@ -49,7 +52,6 @@ describe('#Stream', () => {
 
   it('test readable stream two Mode : paused', done => {
     //手动调动stream.read()
-    const pass = new PassThrough();
     let count = 0;
     pass.on('readable', () => {
       let chunk;
@@ -71,7 +73,6 @@ describe('#Stream', () => {
    * paused  mode switch flowing mode by pipe()、data Event、pause()
    */
   it('test readable switch to Paused mode by call readable.pause()', done => {
-    const pass = new PassThrough();
     const writable = fs.createWriteStream(FILEPATH);
     let dataEventNotEmit = true;
     pass.pause();
@@ -94,7 +95,6 @@ describe('#Stream', () => {
   });
 
   it('test readable switch to Paused mode by call  readable.unpipe()', done => {
-    const pass = new PassThrough();
     const writable = fs.createWriteStream(FILEPATH);
     let dataEventNotEmit = false;
     let readableEventEmit = true;
@@ -126,8 +126,6 @@ describe('#Stream', () => {
   });
 
   it('test readable.setEncoding()', done => {
-    const pass = new PassThrough();
-
     pass.setEncoding('utf8');
 
     pass.on('data', chunk => {
