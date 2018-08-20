@@ -1,15 +1,18 @@
 const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
-const { spawn, exec, fork } = require('child_process');
+const { spawn, spawnSync, exec, fork } = require('child_process');
 const { resolvePath, translateArrStrToArr } = require('../util/util');
 const SHELL_NAME = resolvePath('child_process.js');
 
 describe('#Child_Process', function() {
-  this.timeout(5000);
+  this.timeout(20000);
 
-  it('test process.send(),process.on("message") ', done => {
+  it('test process.send() exist ,process.on("message") ', done => {
     const subprocess = fork(SHELL_NAME, ['signal']);
+    assert.ok(subprocess.send);
+    const ls = spawn('ls'); // spawn exec execFile not established iPC channle with parent
+    assert.equal(ls.send, undefined);
     subprocess.on('message', pid => {
       assert.equal(subprocess.pid, pid);
       done();
@@ -131,5 +134,11 @@ describe('#Child_Process', function() {
       assert.equal(data.toString(), 'write data to child process\n');
       done();
     });
+  });
+
+  it('test spawnSync child process with long run ', done => {
+    const sleep = spawnSync('sleep', ['2']);
+    assert.equal(sleep.status, 0);
+    done();
   });
 });
