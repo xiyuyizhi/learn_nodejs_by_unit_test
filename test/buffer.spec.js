@@ -6,7 +6,9 @@ describe("#Buffer", () => {
         b[0] = 3456;
         assert.equal(b.length, 1);
         assert.ok(b.buffer instanceof ArrayBuffer);
+        assert.equal(b[0],3456%256)
         assert.equal(b[0], new Uint8Array([3456])[0]); // 128
+
 
         const unit16 = new Uint16Array([5000, 4000]);
         const bb = Buffer.from(unit16.buffer);

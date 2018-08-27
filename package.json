@@ -2,10 +2,10 @@
   "name": "learn_nodejs_by_unit_test",
   "version": "0.0.1",
   "description": "learn nodejs by write unit test for api",
-  "main": "index.js",
+  "main": "src/test_use_by_require.js",
   "scripts": {
     "test_all": "mocha --watch --recursive",
-    "test": "mocha --watch  test/child_process.spec.js"
+    "test": "mocha --watch  test/module.spec.js"
   },
   "repository": {
     "type": "git",
