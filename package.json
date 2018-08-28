@@ -4,8 +4,8 @@
   "description": "learn nodejs by write unit test for api",
   "main": "src/test_use_by_require.js",
   "scripts": {
-    "test_all": "mocha --watch --recursive",
-    "test": "mocha --watch  test/error.spec.js"
+    "test_all": "nyc --reporter=html --reporter=text mocha",
+    "test": "mocha --watch  test/path.spec.js"
   },
   "repository": {
     "type": "git",
@@ -23,5 +23,8 @@
   "dependencies": {
     "chai": "^4.1.2",
     "mocha": "^5.2.0"
+  },
+  "devDependencies": {
+    "nyc": "^13.0.1"
   }
 }

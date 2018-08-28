@@ -1,6 +1,7 @@
 const assert = require('assert');
 const path = require('path');
 const { fork } = require('child_process');
+const os = require('os');
 const shellPath = path.resolve(__dirname, '../src/error.js');
 
 describe('#Error', function() {

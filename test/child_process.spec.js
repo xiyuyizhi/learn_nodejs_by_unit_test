@@ -81,19 +81,18 @@ describe('#Child_Process', function() {
     });
   });
 
-  it('test closes the IPC channel between parent and child', done => {
+  it('test close the IPC channel between parent and child', done => {
     const subprocess = fork(SHELL_NAME, ['closeChannel']);
     assert.equal(subprocess.connected, true);
-
     setTimeout(() => {
+      subprocess.disconnect(); // 关闭父子间IPC通道
       subprocess.kill();
     }, 100);
 
     setTimeout(() => {
-      subprocess.disconnect(); // 关闭父子间IPC通道
       assert.equal(subprocess.connected, false);
       done();
-    }, 300);
+    }, 200);
   });
 
   describe('## stdout to file', () => {
@@ -132,6 +131,7 @@ describe('#Child_Process', function() {
     // readable stream
     subprocess.stdout.on('data', data => {
       assert.equal(data.toString(), 'write data to child process\n');
+      subprocess.kill();
       done();
     });
   });

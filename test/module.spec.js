@@ -14,7 +14,7 @@ describe('#Module', () => {
     );
   });
 
-  it('test require() seach file use package.json main prop', () => {
+  it('test require() seach file use  main prop in package.json', () => {
     const { searchPackageJson } = require('../../learn_nodejs_by_unit_test');
     assert.ok(searchPackageJson);
   });

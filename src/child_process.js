@@ -55,7 +55,6 @@ function options_stdio() {
 
 function closeChannel() {
   const timer = setInterval(() => {}, 300);
-
   process.on('SIGTERM', () => {
     clearInterval(timer);
   });
