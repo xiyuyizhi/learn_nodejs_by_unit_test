@@ -5,7 +5,7 @@
   "main": "src/test_use_by_require.js",
   "scripts": {
     "test_all": "nyc --reporter=html --reporter=text mocha",
-    "test": "mocha --watch  test/path.spec.js"
+    "test": "mocha --watch  test/net.spec.js"
   },
   "repository": {
     "type": "git",
