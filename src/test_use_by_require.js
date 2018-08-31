@@ -1,5 +1,3 @@
 exports.searchPackageJson = () => {};
 
-exports.retFileName = () => {
-  return __filename;
-};
+exports.retFileName = () => __filename;

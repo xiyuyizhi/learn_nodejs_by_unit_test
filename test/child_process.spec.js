@@ -1,31 +1,31 @@
 const assert = require('assert');
-const path = require('path');
 const fs = require('fs');
-const { spawn, spawnSync, exec, fork } = require('child_process');
+const { spawn, spawnSync, fork } = require('child_process');
 const { resolvePath, translateArrStrToArr } = require('../util/util');
+
 const SHELL_NAME = resolvePath('child_process.js');
 
-describe('#Child_Process', function() {
+describe('#Child_Process', function () {
   this.timeout(20000);
 
-  it('test process.send() exist ,process.on("message") ', done => {
+  it('test process.send() exist ,process.on("message") ', (done) => {
     const subprocess = fork(SHELL_NAME, ['signal']);
     assert.ok(subprocess.send);
     const ls = spawn('ls'); // spawn exec execFile not established iPC channle with parent
     assert.equal(ls.send, undefined);
-    subprocess.on('message', pid => {
+    subprocess.on('message', (pid) => {
       assert.equal(subprocess.pid, pid);
       done();
     });
   });
 
-  it('test kill child process by clearInterval or process.exit() ', done => {
+  it('test kill child process by clearInterval or process.exit() ', (done) => {
     const subprocess = fork(SHELL_NAME, ['killChild'], {
-      stdio: ['inherit', 'pipe', 'inherit', 'ipc']
+      stdio: ['inherit', 'pipe', 'inherit', 'ipc'],
     });
     assert.equal(subprocess.connected, true);
-    subprocess.stdout.on('data', data => {
-      assert.equal(subprocess.pid + '_exit\n', data.toString());
+    subprocess.stdout.on('data', (data) => {
+      assert.equal(`${subprocess.pid}_exit\n`, data.toString());
     });
     setTimeout(() => {
       subprocess.kill();
@@ -37,11 +37,11 @@ describe('#Child_Process', function() {
     }, 500);
   });
 
-  it('test child process not exit when have message Event and not explicit call process.exit() ', done => {
+  it('test child process not exit when have message Event and not explicit call process.exit() ', (done) => {
     const subprocess = fork(SHELL_NAME, ['notEmitWhenHaveMessage']);
     assert.equal(subprocess.connected, true);
     setTimeout(() => {
-      subprocess.send('exit'); //not effect
+      subprocess.send('exit'); // not effect
     }, 200);
     setTimeout(() => {
       assert.equal(subprocess.connected, true);
@@ -56,32 +56,32 @@ describe('#Child_Process', function() {
     }, 500);
   });
 
-  it('test fork() with options.silent = true', done => {
+  it('test fork() with options.silent = true', (done) => {
     const subprocess = fork(SHELL_NAME, ['silent'], {
-      silent: true // default is false(inherited from the parent,this time,log to terminal)
+      silent: true, // default is false(inherited from the parent,this time,log to terminal)
     });
     assert.ok(subprocess.stdout);
-    subprocess.stdout.on('data', data => {
+    subprocess.stdout.on('data', (data) => {
       const result = translateArrStrToArr(data.toString());
       assert.equal(result[0], 'log_to_parent_not_to_terminal');
       done();
     });
   });
 
-  it('test setting options.stdio', done => {
+  it('test setting options.stdio', (done) => {
     const subprocess = fork(SHELL_NAME, ['options_stdio'], {
-      stdio: ['pipe', 'inherit', 'pipe', 'ipc'] // stdin pipe parent process , stdout、stderr继承parent,打印到terminal
+      stdio: ['pipe', 'inherit', 'pipe', 'ipc'], // stdin pipe parent process , stdout、stderr继承parent,打印到terminal
     });
 
     assert.ok(subprocess.stdin);
     assert.equal(subprocess.stdout, null);
-    subprocess.stderr.on('data', data => {
+    subprocess.stderr.on('data', (data) => {
       assert.ok(data);
       done();
     });
   });
 
-  it('test close the IPC channel between parent and child', done => {
+  it('test close the IPC channel between parent and child', (done) => {
     const subprocess = fork(SHELL_NAME, ['closeChannel']);
     assert.equal(subprocess.connected, true);
     setTimeout(() => {
@@ -96,19 +96,19 @@ describe('#Child_Process', function() {
   });
 
   describe('## stdout to file', () => {
-    after(function() {
+    after(() => {
       fs.unlinkSync('test/stdout.txt');
       fs.unlinkSync('test/stderr.txt');
     });
 
-    it('test write child process stdout to file', done => {
+    it('test write child process stdout to file', (done) => {
       spawn('ls', ['/noExitDir'], {
         stdio: [
           'pipe',
           fs.openSync('test/stdout.txt', 'w'),
-          fs.openSync('test/stderr.txt', 'w')
+          fs.openSync('test/stderr.txt', 'w'),
           // process.stderr
-        ]
+        ],
       });
       setTimeout(() => {
         const exits = fs.existsSync('test/stdout.txt');
@@ -120,23 +120,23 @@ describe('#Child_Process', function() {
     });
   });
 
-  it('test childprocess.stdin as writeable stream', done => {
+  it('test childprocess.stdin as writeable stream', (done) => {
     const subprocess = fork(SHELL_NAME, ['stdinWritable'], {
-      stdio: ['pipe', 'pipe', process.stderr, 'ipc']
+      stdio: ['pipe', 'pipe', process.stderr, 'ipc'],
     });
 
-    //writable stream
+    // writable stream
     subprocess.stdin.write('write data to child process');
 
     // readable stream
-    subprocess.stdout.on('data', data => {
+    subprocess.stdout.on('data', (data) => {
       assert.equal(data.toString(), 'write data to child process\n');
       subprocess.kill();
       done();
     });
   });
 
-  it('test spawnSync child process with long run ', done => {
+  it('test spawnSync child process with long run ', (done) => {
     const sleep = spawnSync('sleep', ['2']);
     assert.equal(sleep.status, 0);
     done();

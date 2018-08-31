@@ -1,0 +1,33 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+
+  "globals": {
+    "it": true,
+    "describe": true,
+    "beforeEach": true,
+    "afterEach": true,
+    "before": true,
+    "after": true
+  },
+
+  "extends": "eslint-config-ali",
+  "rules": {
+    "semi": 2,
+    "import/no-named-as-default": 0,
+    "camelcase": [2, { "properties": "never", "ignoreDestructuring": true }],
+    "new-cap": 2,
+    "eqeqeq": 0,
+    "no-useless-escape": 0,
+    "no-nested-ternary": 0,
+    "no-mixed-operators": 0,
+    "prefer-destructuring": ["error", { "object": true, "array": false }],
+    "no-param-reassign": 0,
+    "import/prefer-default-export": 0,
+    "no-underscore-dangle": ["error", { "enforceInMethodNames": true }],
+    "no-console": 0,
+    "no-new": 0
+  }
+}

@@ -1,10 +1,8 @@
-//
-//
-//
+/* eslint no-undef:'off' */
 const EventEmitter = require('events');
 
 if (process.argv[2] == 'uncaughtException') {
-  process.on('uncaughtException', error => {
+  process.on('uncaughtException', (error) => {
     console.log(error.message);
   });
 
@@ -12,7 +10,7 @@ if (process.argv[2] == 'uncaughtException') {
 }
 
 if (process.argv[2] == 'uncaughtException_Async') {
-  process.on('uncaughtException', error => {
+  process.on('uncaughtException', (error) => {
     console.log(error.message);
   });
 
@@ -22,14 +20,14 @@ if (process.argv[2] == 'uncaughtException_Async') {
 }
 
 if (process.argv[2] == 'tryCatch') {
-  process.on('uncaughtException', error => {
-    console.log('handle in uncaughtException：' + error.message);
+  process.on('uncaughtException', (error) => {
+    console.log(`handle in uncaughtException：${error.message}`);
   });
 
   try {
     console.log(a);
   } catch (e) {
-    console.log('handle in catch：' + e.message);
+    console.log(`handle in catch：${e.message}`);
     setTimeout(() => {
       throw new Error('async error');
     }, 1000);
@@ -46,8 +44,8 @@ if (process.argv[2] == 'handleByErrorEvent') {
     });
   });
 
-  cusE.on('error', error => {
-    process.send('in error event：' + error.message);
+  cusE.on('error', (error) => {
+    process.send(`in error event：${error.message}`);
   });
 
   cusE.emit('event1');

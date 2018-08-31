@@ -12,13 +12,15 @@ switch (process.argv[2]) {
     silent();
     break;
   case 'options_stdio':
-    options_stdio();
+    optionsStdio();
     break;
   case 'closeChannel':
     closeChannel();
     break;
   case 'stdinWritable':
     stdinWritable();
+    break;
+  default:
     break;
 }
 
@@ -40,7 +42,7 @@ function notEmitWhenHaveMessage() {
     process.exit();
     // clearInterval(timer); // not effect,can not exit process
   });
-  process.on('message', msg => {
+  process.on('message', () => {
     clearInterval(timer); // not effect,can not exit process
   });
 }
@@ -49,7 +51,7 @@ function silent() {
   console.log('log_to_parent_not_to_terminal');
 }
 
-function options_stdio() {
+function optionsStdio() {
   throw new Error('error');
 }
 
@@ -63,7 +65,7 @@ function closeChannel() {
 }
 
 function stdinWritable() {
-  process.stdin.on('data', data => {
+  process.stdin.on('data', (data) => {
     console.log(data.toString());
   });
 }

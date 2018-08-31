@@ -16,8 +16,8 @@ describe('#Buffer', () => {
 
     assert.equal(bb.length, 4);
     bb.swap16(); // <Buffer 13 88 0f a0>
-    const hex_5000 = (5000).toString(16); //1388
-    assert.equal(bb[0].toString(16) + bb[1].toString(16), hex_5000);
+    const hex5000 = (5000).toString(16); // 1388
+    assert.equal(bb[0].toString(16) + bb[1].toString(16), hex5000);
   });
 
   it('test Buffer.from(Array)', () => {
@@ -29,7 +29,7 @@ describe('#Buffer', () => {
   });
 
   it('test Buffer.from(arrayBuffer)', () => {
-    //Int8Array store number rang -128 ~ 127
+    // Int8Array store number rang -128 ~ 127
     const int8Arr = new Int8Array(8);
     int8Arr[0] = 1;
     int8Arr[1] = 127;
@@ -39,17 +39,17 @@ describe('#Buffer', () => {
 
     assert.equal(int8Arr[0], 1);
     assert.equal(int8Arr[1], 127);
-    assert.equal(int8Arr[2], -128); //128的二进制表示 ‘1000 0000’, 在8位有符号整数中表示 -128
+    assert.equal(int8Arr[2], -128); // 128的二进制表示 ‘1000 0000’, 在8位有符号整数中表示 -128
     assert.equal(int8Arr[3], -128);
     assert.equal(int8Arr[4], 127); // -129的二进制表示 源‘1 1000 0001’  返‘1 0111 1110’ 补‘1 0111 1111’
     // 补码第一位忽略 ‘0111 1111’，表示127
 
     const b = Buffer.from(int8Arr); // not shared memory,copy
-    const c = Buffer.from(int8Arr.buffer); //shared memory
+    const c = Buffer.from(int8Arr.buffer); // shared memory
 
     assert.equal(b[0], 1);
     assert.equal(b[1], 127);
-    assert.equal(b[2], 128); //上面是有符号，这里是无符号 128  因为 Buffer内部实现的是Uint8Array
+    assert.equal(b[2], 128); // 上面是有符号，这里是无符号 128  因为 Buffer内部实现的是Uint8Array
     assert.equal(b[4], 127);
 
     int8Arr[0] = 100;
@@ -77,7 +77,7 @@ describe('#Buffer', () => {
     assert.equal(b[1], 50);
     assert.equal(b.length, 3);
 
-    //汉子占三个字节
+    // 汉子占三个字节
     const c = Buffer.from('哈');
     assert.equal(c.length, 3);
   });
@@ -89,17 +89,17 @@ describe('#Buffer', () => {
     });
 
     const b = Buffer.from(int16Arr); // Copies the passed buffer data
-    const b_buffer = Buffer.from(int16Arr.buffer); // the newly created Buffer will share the same allocated memory
+    const bBuffer = Buffer.from(int16Arr.buffer); // the newly created Buffer will share the same allocated memory
     assert.equal(int16Arr.length, 16);
     assert.equal(int16Arr.byteLength, 32);
     assert.equal(b.length, 16);
-    assert.equal(b_buffer.length, 32);
+    assert.equal(bBuffer.length, 32);
     int16Arr[0] = 100;
 
     assert.equal(b[0], 0); // not shared memory
-    assert.equal(b_buffer[0], 100); // shard memory with int16Arr
-    assert.equal(b_buffer[1], 0); // 两个字节表示int16Arr中的一个元素
-    assert.equal(b_buffer[2], 1);
+    assert.equal(bBuffer[0], 100); // shard memory with int16Arr
+    assert.equal(bBuffer[1], 0); // 两个字节表示int16Arr中的一个元素
+    assert.equal(bBuffer[2], 1);
   });
 
   it('test create new TypedArray with Buffer args', () => {
@@ -113,9 +113,9 @@ describe('#Buffer', () => {
   });
 
   describe('## 测试乱码', () => {
-    before(done => {
+    before((done) => {
       const writer = fs.createWriteStream('test/静夜思.txt', {
-        flags: 'w'
+        flags: 'w',
       });
       writer.write('窗前明月光,疑是地上霜,举头望明月,低头思故乡。');
       writer.end(() => {
@@ -125,16 +125,16 @@ describe('#Buffer', () => {
     after(() => {
       fs.unlinkSync('test/静夜思.txt');
     });
-    it('test buffer encoding gibberish', done => {
+    it('test buffer encoding gibberish', (done) => {
       const reader = fs.createReadStream('test/静夜思.txt', {
-        highWaterMark: 11
+        highWaterMark: 11,
       });
       // 20 * 3 + 4 byte 64字节
       let first = true;
-      let result = [];
-      let readTimes = Math.ceil((20 * 3 + 4) / 11);
+      const result = [];
+      const readTimes = Math.ceil((20 * 3 + 4) / 11);
       // reader.setEncoding("utf8");
-      reader.on('data', chunk => {
+      reader.on('data', (chunk) => {
         result.push(chunk.toString());
         if (!first) return;
         first = false;
@@ -144,7 +144,7 @@ describe('#Buffer', () => {
       });
       reader.on('close', () => {
         // console.log(result);
-        //[ '窗前明�', '�光,疑是', '地上霜,', '举头望明', '月,低头', '思故乡。' ]
+        // [ '窗前明�', '�光,疑是', '地上霜,', '举头望明', '月,低头', '思故乡。' ]
         assert.equal(readTimes, result.length);
         assert.notEqual(result[0].charAt(3), '月');
         assert.notEqual(result[1].charAt(0), '月');
@@ -154,14 +154,14 @@ describe('#Buffer', () => {
       });
     });
 
-    it('test use string_decoder to handle multi-byte character', done => {
+    it('test use string_decoder to handle multi-byte character', (done) => {
       const reader = fs.createReadStream('test/静夜思.txt', {
-        highWaterMark: 11
+        highWaterMark: 11,
       });
-      let chunks = [];
+      const chunks = [];
       const decoder = new StringDecoder('utf8');
 
-      reader.on('data', chunk => {
+      reader.on('data', (chunk) => {
         chunks.push(decoder.write(chunk));
       });
 

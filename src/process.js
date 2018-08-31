@@ -41,38 +41,40 @@ switch (process.argv[2]) {
   case 'uncaughtExceptionNoEmit':
     uncaughtExceptionNoEmit();
     break;
+  default:
+    break;
 }
 
 function beforeExit() {
-  process.on('beforeExit', exitCode => {
-    console.log('exitCode:' + exitCode);
+  process.on('beforeExit', (exitCode) => {
+    console.log(`exitCode:${exitCode}`);
   });
 }
 
 function processExplicitlyExit() {
-  process.on('beforeExit', exitCode => {
-    //not emit
-    console.log('exitCode:' + exitCode);
+  process.on('beforeExit', (exitCode) => {
+    // not emit
+    console.log(`exitCode:${exitCode}`);
   });
   process.exit();
 }
 
 function processExplicitlyExit1() {
-  process.on('beforeExit', exitCode => {
-    //not emit and throw error
-    console.log('exitCode:' + exitCode);
+  process.on('beforeExit', (exitCode) => {
+    // not emit and throw error
+    console.log(`exitCode:${exitCode}`);
   });
   process.exit(1);
 }
 
 function processExplicitlyExitCode() {
-  process.on('beforeExit', exitCode => {
-    //not emit and throw error
-    console.log('exitCode:' + exitCode);
+  process.on('beforeExit', (exitCode) => {
+    // not emit and throw error
+    console.log(`exitCode:${exitCode}`);
   });
-  process.on('exit', exitCode => {
-    //not emit and throw error
-    console.log('ExitEvnt|exitCode:' + exitCode);
+  process.on('exit', (exitCode) => {
+    // not emit and throw error
+    console.log(`ExitEvnt|exitCode:${exitCode}`);
   });
 
   process.exitCode = 1;
@@ -91,8 +93,8 @@ function killChild() {
     process.exit();
   });
 
-  process.on('message', msg => {
-    console.log('child get msg: ' + msg);
+  process.on('message', (msg) => {
+    console.log(`child get msg: ${msg}`);
     process.exit();
   });
 
@@ -113,61 +115,61 @@ function nextTick() {
 }
 
 function unhandledRejectionEmit() {
-  process.on('unhandledRejection', (reason, p) => {
-    console.log('in_unhandledRejection_event:' + reason);
+  process.on('unhandledRejection', (reason) => {
+    console.log(`in_unhandledRejection_event:${reason.message}`);
   });
 
   new Promise((resolve, reject) => {
     setTimeout(() => {
-      reject('reject_value');
+      reject(new Error('reject_value'));
     }, 200);
   });
 }
 
 function unhandledRejectionNoEmit() {
-  process.on('unhandledRejection', (reason, p) => {
-    //will emit when not catch below
+  process.on('unhandledRejection', () => {
+    // will emit when not catch below
     console.log('can not emit');
   });
 
   new Promise((resolve, reject) => {
     setTimeout(() => {
-      reject('reject_value');
+      reject(new Error('reject_value'));
     }, 200);
-  }).catch(x => {
-    console.log('in_catch_:' + x);
+  }).catch((x) => {
+    console.log(`in_catch_:${x.message}`);
   });
 }
 
 function throwErrorInThen() {
-  new Promise((resolve, reject) => {
+  new Promise((resolve) => {
     setTimeout(() => {
       resolve('resolve_value');
     }, 200);
   })
     .then(
-      res => {
-        console.log('get_result:' + res);
+      (res) => {
+        console.log(`get_result:${res}`);
         throw new Error('error_in_success_handler');
       },
-      error => {
+      () => {
         console.log('not emit');
       }
     )
-    .catch(x => {
-      console.log('in_catch_:' + x.message);
+    .catch((x) => {
+      console.log(`in_catch_:${x.message}`);
     });
 }
 
 function uncaughtExceptionNoEmit() {
-  process.on('uncaughtException', err => {
-    //will emit when no catch below
-    console.log('uncaughtException:' + err.message);
+  process.on('uncaughtException', (err) => {
+    // will emit when no catch below
+    console.log(`uncaughtException:${err.message}`);
   });
 
   try {
     throw new Error('error');
   } catch (x) {
-    console.log('In_Catch:' + x.message);
+    console.log(`In_Catch:${x.message}`);
   }
 }

@@ -5,13 +5,13 @@ const { fork } = require('child_process');
 
 const SHELL_NAME = path.join(__dirname, '../', '', 'src/net.js');
 
-describe('#net', function() {
+describe('#net', function () {
   this.timeout(5000);
 
-  it('test create a tcp server', done => {
+  it('test create a tcp server', (done) => {
     const server = net.createServer().listen(8993);
 
-    server.on('connection', socket => {
+    server.on('connection', (socket) => {
       console.log(socket.address());
       assert.equal(socket.address().port, 8123);
     });
@@ -22,9 +22,9 @@ describe('#net', function() {
     });
   });
 
-  it('test two server with same port,then case error', done => {
-    //the 'close' event will not be emitted directly following this event
-    //unless server.close() is manually called
+  it('test two server with same port,then case error', (done) => {
+    // the 'close' event will not be emitted directly following this event
+    // unless server.close() is manually called
     const server = net.createServer().listen(8993);
     const server1 = net.createServer().listen(8993);
 
@@ -37,8 +37,8 @@ describe('#net', function() {
       assert.equal(server1.listening, true);
     });
 
-    server1.on('error', error => {
-      //server1监听的端口冲突了
+    server1.on('error', (error) => {
+      // server1监听的端口冲突了
       assert.equal(server1.listening, false);
       assert.equal(error.code, 'EADDRINUSE');
       if (error.code == 'EADDRINUSE') {
@@ -54,7 +54,7 @@ describe('#net', function() {
     }, 100);
   });
 
-  it('test server.unref().【Calling unref on a server will allow the program to exit if this is the only active server in the event system】', done => {
+  it('test server.unref().【Calling unref on a server will allow the program to exit if this is the only active server in the event system】', (done) => {
     const sub = fork(SHELL_NAME, ['unref']);
     setTimeout(() => {
       assert.ok(sub.channel);
@@ -66,7 +66,7 @@ describe('#net', function() {
     });
   });
 
-  it('test server.close()', done => {
+  it('test server.close()', (done) => {
     const sub = fork(SHELL_NAME, ['close']);
     assert.ok(sub.channel);
     setTimeout(() => {
@@ -83,11 +83,11 @@ describe('#net', function() {
     }, 1000);
   });
 
-  it('test new connection to sever,emit "connection" Event of server,"connect" Event of client  ', done => {
+  it('test new connection to sever,emit "connection" Event of server,"connect" Event of client  ', (done) => {
     const server = net.createServer();
     server.listen(8993);
 
-    server.on('connection', socket => {
+    server.on('connection', (socket) => {
       assert.equal(socket.address().port, 8993);
       assert.equal(socket.localPort, 8993);
     });
@@ -110,25 +110,25 @@ describe('#net', function() {
     let server;
     let client;
 
-    beforeEach(done => {
+    beforeEach((done) => {
       server = net.createServer().listen(8993);
       client = net.createConnection({ port: 8993 });
       done();
     });
 
-    afterEach(done => {
+    afterEach((done) => {
       server.close();
       client.end();
       done();
     });
 
-    it('test sever write data to client,to server', done => {
-      server.on('connection', socket => {
+    it('test sever write data to client,to server', (done) => {
+      server.on('connection', (socket) => {
         socket.write('data from sever');
         server.getConnections((err, count) => {
           assert.equal(count, 1);
         });
-        socket.on('data', chunk => {
+        socket.on('data', (chunk) => {
           assert.equal(chunk, 'data to server');
         });
       });
@@ -140,7 +140,7 @@ describe('#net', function() {
         client.write('data to server');
       });
       client.setEncoding('utf8');
-      client.on('data', chunk => {
+      client.on('data', (chunk) => {
         assert.equal(chunk, 'data from sever');
       });
       client.on('close', () => {
@@ -151,15 +151,15 @@ describe('#net', function() {
       }, 4000);
     });
 
-    it('test establish multi connection to server', done => {
+    it('test establish multi connection to server', (done) => {
       let count = 0;
-      server.on('connection', socket => {
+      server.on('connection', () => {
         server.getConnections((err, cot) => {
           count = cot;
         });
       });
 
-      new Array(5).fill(0).forEach(x => {
+      new Array(5).fill(0).forEach(() => {
         net.createConnection({ port: 8993 });
       });
 
@@ -170,27 +170,24 @@ describe('#net', function() {
     });
   });
 
-  it('test socket close by the client', done => {
+  it('test socket close by the client', (done) => {
     const server = net.createServer().listen(8993);
 
-    server.on('connection', socket => {
-      //延迟，在socket被关闭后才发送数据
+    server.on('connection', (socket) => {
+      // 延迟，在socket被关闭后才发送数据
       setTimeout(() => {
         socket.write('write data to client');
       }, 500);
 
-      socket.on('error', err => {
-        assert.equal(
-          err.message,
-          'This socket has been ended by the other party'
-        );
+      socket.on('error', (err) => {
+        assert.equal(err.message, 'This socket has been ended by the other party');
       });
     });
 
     const client = net.createConnection({ port: 8993 });
 
     client.on('connect', () => {
-      client.destroy(); //建立连接后就把socket关闭
+      client.destroy(); // 建立连接后就把socket关闭
     });
 
     let clientClose = false;
@@ -212,12 +209,12 @@ describe('#net', function() {
    * end...
    * write data to server
    */
-  it('test  socket closed by server', done => {
+  it('test  socket closed by server', (done) => {
     const server = net.createServer().listen(8993);
 
-    server.on('connection', socket => {
+    server.on('connection', (socket) => {
       //   console.log('connection');
-      socket.on('data', chunk => {
+      socket.on('data', () => {
         // console.log(chunk.toString());
       });
       socket.end('end...');
@@ -233,15 +230,12 @@ describe('#net', function() {
       }, 100);
     });
 
-    client.on('data', chunk => {
+    client.on('data', () => {
       //   console.log(chunk.toString());
     });
 
-    client.on('error', error => {
-      assert.equal(
-        error.message,
-        'This socket has been ended by the other party'
-      );
+    client.on('error', (error) => {
+      assert.equal(error.message, 'This socket has been ended by the other party');
     });
 
     setTimeout(() => {
@@ -250,16 +244,16 @@ describe('#net', function() {
     }, 1000);
   });
 
-  it('test allowHalfOpen', done => {
+  it('test allowHalfOpen', (done) => {
     const server = net
       .createServer({
-        allowHalfOpen: true
+        allowHalfOpen: true,
       })
       .listen(8993);
 
     const client = net.createConnection({ port: 8993 });
 
-    server.on('connection', socket => {
+    server.on('connection', (socket) => {
       let socketClose = false;
       let endEmitOnServerSlide = false;
 
@@ -276,7 +270,7 @@ describe('#net', function() {
         endEmitOnServerSlide = true;
       });
 
-      //500 ms后显式完全关闭socket
+      // 500 ms后显式完全关闭socket
       setTimeout(() => {
         socket.end();
         setTimeout(() => {
@@ -286,13 +280,13 @@ describe('#net', function() {
     });
 
     client.on('connect', () => {
-      client.end(); //建立连接后，立即管理client端socket，触发server端 socket.on('end')
+      client.end(); // 建立连接后，立即管理client端socket，触发server端 socket.on('end')
     });
 
     let closed = false;
     let endEmitOnClientSide = false;
 
-    //在 socket的服务端end()后，以下两事件触发
+    // 在 socket的服务端end()后，以下两事件触发
     client.on('close', () => {
       closed = true;
     });

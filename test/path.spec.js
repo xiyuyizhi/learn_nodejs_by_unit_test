@@ -15,12 +15,10 @@ describe('#Path', () => {
   });
 
   it('path.dirname(path)', () => {
+    /* eslint no-underscore-dangle:"off" */
     const _path = '/Users/cage/codeme/learn_nodejs_by_unit_test/path.spec.js';
 
-    assert.equal(
-      path.dirname(_path),
-      '/Users/cage/codeme/learn_nodejs_by_unit_test'
-    );
+    assert.equal(path.dirname(_path), '/Users/cage/codeme/learn_nodejs_by_unit_test');
   });
 
   it('path.extname(path)', () => {
@@ -31,10 +29,7 @@ describe('#Path', () => {
   });
 
   it('path.join()', () => {
-    assert.equal(
-      path.join('/foo', 'bar', 'baz/asdf', 'quux', '..'),
-      '/foo/bar/baz/asdf'
-    );
+    assert.equal(path.join('/foo', 'bar', 'baz/asdf', 'quux', '..'), '/foo/bar/baz/asdf');
     assert.equal(path.join('../abc', 'd', 'e'), '../abc/d/e');
 
     assert.equal(path.join('../abc', 'd', 'e/'), '../abc/d/e/');
